@@ -1,0 +1,25 @@
+{
+  "name": "ynab-sms",
+  "version": "1.0.0",
+  "description": "Sends information about YNAB budgets via SMS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Danomanic/ynab-sms.git"
+  },
+  "author": "Daniel J. Pomfret",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Danomanic/ynab-sms/issues"
+  },
+  "homepage": "https://github.com/Danomanic/ynab-sms#readme",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "messagebird": "^2.4.1",
+    "ynab": "^1.12.0"
+  }
+}
