@@ -1,22 +1,40 @@
-const env = require('dotenv').config();
-const ynab = require("ynab");
+require('dotenv').config();
+
+const ynab = require('ynab');
+
 const ynabAPI = new ynab.API(process.env.YNAB_KEY);
+const messagebird = require('messagebird')(process.env.MESSAGEBIRD_KEY);
+const dateFormat = require('dateformat');
+const budget_id = process.env.YNAB_BUDGET_ID;
+const { log } = console;
+const now = new Date();
+const date = dateFormat(now, "d-mm");
+const categories = process.env.YNAB_CATEGORIES.split(',');
+const recipients = process.env.MESSAGEBIRD_RECIPIENTS.split(',');
 
-var messagebird = require('messagebird')(process.env.MESSAGEBIRD_KEY);
+async function getCategory(category) {
+    const result = await ynabAPI.categories.getCategoryById(budget_id, category);
+    return result;
+}
 
-// Test Message Bird Connection
-messagebird.balance.read(function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
-  console.log(data);
-});
+async function sendSms(body) {
+    messagebird.messages.create({
+        originator: 'Budget',
+        recipients: recipients,
+        body,
+    }, (err, response) => {
+        if (err) {
+            log(err);
+        }
+    });
+}
 
-// Test YNAB Connection
 (async function() {
-  const budgetsResponse = await ynabAPI.budgets.getBudgets();
-  const budgets = budgetsResponse.data.budgets;
-  for(let budget of budgets) {
-    console.log(`Budget Name: ${budget.name}`);
-  }
-})();
+    let body = `Remaining Balances (${date}):\n----------------------------------\n`;
+    await Promise.all(categories.map(async(category) => {
+        const data = await getCategory(category);
+        const balance = data.data.category.balance / 1000;
+        body = body.concat(`${data.data.category.name} => £${balance}\n`);
+    }));
+    await sendSms(body);
+}());

@@ -18,8 +18,14 @@
   },
   "homepage": "https://github.com/Danomanic/ynab-sms#readme",
   "dependencies": {
+    "dateformat": "^3.0.3",
     "dotenv": "^8.0.0",
     "messagebird": "^2.4.1",
     "ynab": "^1.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.18.0"
   }
 }
