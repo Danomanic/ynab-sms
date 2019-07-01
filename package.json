@@ -21,6 +21,7 @@
     "dateformat": "^3.0.3",
     "dotenv": "^8.0.0",
     "messagebird": "^2.4.1",
+    "node-schedule": "^1.3.2",
     "ynab": "^1.12.0"
   },
   "devDependencies": {

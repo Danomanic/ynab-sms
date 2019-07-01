@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const schedule = require('node-schedule');
+
 const ynab = require('ynab');
 
 const ynabAPI = new ynab.API(process.env.YNAB_KEY);
@@ -29,12 +31,17 @@ async function sendSms(body) {
     });
 }
 
-(async function() {
+async function main() {
     let body = `Remaining Balances (${date}):\n----------------------------------\n`;
     await Promise.all(categories.map(async(category) => {
         const data = await getCategory(category);
         const balance = data.data.category.balance / 1000;
         body = body.concat(`${data.data.category.name} => £${balance}\n`);
     }));
-    await sendSms(body);
-}());
+    log(body);
+    //await sendSms(body);
+}
+
+var job = schedule.scheduleJob('0 8 * * *', function(fireDate){
+    main();
+});
