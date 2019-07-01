@@ -38,8 +38,7 @@ async function main() {
         const balance = data.data.category.balance / 1000;
         body = body.concat(`${data.data.category.name} => £${balance}\n`);
     }));
-    log(body);
-    //await sendSms(body);
+    await sendSms(body);
 }
 
 var job = schedule.scheduleJob('0 8 * * *', function(fireDate){
