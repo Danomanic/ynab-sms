@@ -12,6 +12,7 @@ const budgetId = process.env.YNAB_BUDGET_ID;
 
 const now = new Date();
 const date = dateFormat(now, 'd-mm');
+const cronConfig = process.env.CRON_CONFIG;
 
 const categories = process.env.YNAB_CATEGORIES.split(',');
 const recipients = process.env.MESSAGEBIRD_RECIPIENTS.split(',');
@@ -43,6 +44,6 @@ async function main() {
   await sendSms(body);
 }
 
-const job = schedule.scheduleJob('0 8 * * *', () => {
+const job = schedule.scheduleJob(cronConfig, () => {
   main();
 });
