@@ -1,46 +1,48 @@
 require('dotenv').config();
 
 const schedule = require('node-schedule');
-
+const dateFormat = require('dateformat');
 const ynab = require('ynab');
+const messagebird = require('messagebird')(process.env.MESSAGEBIRD_KEY);
+
+const { log } = console;
 
 const ynabAPI = new ynab.API(process.env.YNAB_KEY);
-const messagebird = require('messagebird')(process.env.MESSAGEBIRD_KEY);
-const dateFormat = require('dateformat');
-const budget_id = process.env.YNAB_BUDGET_ID;
-const { log } = console;
+const budgetId = process.env.YNAB_BUDGET_ID;
+
 const now = new Date();
-const date = dateFormat(now, "d-mm");
+const date = dateFormat(now, 'd-mm');
+
 const categories = process.env.YNAB_CATEGORIES.split(',');
 const recipients = process.env.MESSAGEBIRD_RECIPIENTS.split(',');
 
 async function getCategory(category) {
-    const result = await ynabAPI.categories.getCategoryById(budget_id, category);
-    return result;
+  const result = await ynabAPI.categories.getCategoryById(budgetId, category);
+  return result;
 }
 
 async function sendSms(body) {
-    messagebird.messages.create({
-        originator: 'Budget',
-        recipients: recipients,
-        body,
-    }, (err, response) => {
-        if (err) {
-            log(err);
-        }
-    });
+  messagebird.messages.create({
+    originator: 'Budget',
+    recipients,
+    body,
+  }, (err, response) => {
+    if (err) {
+      log(err);
+    }
+  });
 }
 
 async function main() {
-    let body = `Remaining Balances (${date}):\n----------------------------------\n`;
-    await Promise.all(categories.map(async(category) => {
-        const data = await getCategory(category);
-        const balance = data.data.category.balance / 1000;
-        body = body.concat(`${data.data.category.name} => £${balance}\n`);
-    }));
-    await sendSms(body);
+  let body = `Remaining Balances (${date}):\n----------------------------------\n`;
+  await Promise.all(categories.map(async (category) => {
+    const data = await getCategory(category);
+    const balance = data.data.category.balance / 1000;
+    body = body.concat(`${data.data.category.name} => £${balance}\n`);
+  }));
+  await sendSms(body);
 }
 
-var job = schedule.scheduleJob('0 8 * * *', function(fireDate){
-    main();
+const job = schedule.scheduleJob('0 8 * * *', () => {
+  main();
 });
