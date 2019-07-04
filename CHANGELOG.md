@@ -1,6 +1,9 @@
 # Changelog
 ---------
 
+### 0.0.3 (July 04, 2019)
+- Update license
+
 ### 0.0.2 (July 04, 2019)
 - Added .env example
 
